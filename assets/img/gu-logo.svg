@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="G.U SOLUTIONS emblem">
+  <defs>
+    <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F7931D"/>
+      <stop offset="1" stop-color="#F7931D" stop-opacity="0.85"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke-linejoin="round">
+    <!-- Outer geometric shield -->
+    <path d="M60 10 L98 32 L98 88 L60 110 L22 88 L22 32 Z" fill="#4A2E2B"/>
+
+    <!-- Inner vertical pillars (construction motif) -->
+    <rect x="32" y="40" width="12" height="48" rx="2" fill="#4A2E2B"/>
+    <rect x="54" y="26" width="12" height="68" rx="2" fill="#4A2E2B"/>
+    <rect x="76" y="34" width="12" height="60" rx="2" fill="#4A2E2B"/>
+
+    <!-- Accent cuts mimicking card style -->
+    <path d="M22 32 L42 46 L42 56 L22 42 Z" fill="url(#accent)"/>
+    <path d="M98 88 L78 76 L78 66 L98 78 Z" fill="#F7931D"/>
+  </g>
+</svg>

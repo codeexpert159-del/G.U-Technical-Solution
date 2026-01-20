@@ -1,0 +1,382 @@
+<!-- 
+  INTEGRATION GUIDE FOR EXISTING PAGES
+  
+  Follow these steps to display dynamic content from admin system:
+  
+  1. Add links to content loader script and CSS
+  2. Add containers where you want content to appear
+  3. Add JavaScript to populate containers
+  
+  This file shows examples for projects.html and services.html
+-->
+
+<!-- ============================================
+     PROJECTS.HTML INTEGRATION
+     ============================================ -->
+
+<!-- STEP 1: Add to <head> section of projects.html -->
+<link href="assets/css/admin.css" rel="stylesheet">
+<script src="assets/js/content-loader.js"></script>
+
+<!-- STEP 2: Replace or add to projects section in projects.html -->
+<!-- Find the section where projects are displayed and add an ID -->
+<div id="projectsContainer" class="projects-grid">
+  <!-- Dynamic content will be inserted here -->
+</div>
+
+<!-- STEP 3: Add before closing </body> in projects.html -->
+<script>
+window.addEventListener('contentLoaderReady', () => {
+  const container = document.getElementById('projectsContainer');
+  
+  if (contentLoader.projects.length === 0) {
+    container.innerHTML = '<p style="text-align: center; padding: 20px;">No projects available</p>';
+    return;
+  }
+  
+  container.innerHTML = contentLoader.projects
+    .filter(project => project.status === 'completed') // Only show completed projects
+    .map(project => contentLoader.renderProjectCard(project))
+    .join('');
+});
+</script>
+
+
+<!-- ============================================
+     SERVICES.HTML INTEGRATION
+     ============================================ -->
+
+<!-- STEP 1: Add to <head> section of services.html -->
+<link href="assets/css/admin.css" rel="stylesheet">
+<script src="assets/js/content-loader.js"></script>
+
+<!-- STEP 2: Replace or add to services section in services.html -->
+<!-- Find the section where services are displayed and add an ID -->
+<div id="servicesContainer" class="services-grid">
+  <!-- Dynamic content will be inserted here -->
+</div>
+
+<!-- STEP 3: Add before closing </body> in services.html -->
+<script>
+window.addEventListener('contentLoaderReady', () => {
+  const container = document.getElementById('servicesContainer');
+  
+  if (contentLoader.services.length === 0) {
+    container.innerHTML = '<p style="text-align: center; padding: 20px;">No services available</p>';
+    return;
+  }
+  
+  container.innerHTML = contentLoader.services
+    .map(service => contentLoader.renderServiceCard(service))
+    .join('');
+});
+</script>
+
+
+<!-- ============================================
+     PROJECT-DETAILS.HTML INTEGRATION
+     ============================================ -->
+
+<!-- STEP 1: Add to <head> section of project-details.html -->
+<link href="assets/css/admin.css" rel="stylesheet">
+<script src="assets/js/content-loader.js"></script>
+
+<!-- STEP 2: Add container for project details -->
+<div id="projectDetailsContainer">
+  <!-- Dynamic content will be inserted here -->
+</div>
+
+<!-- STEP 3: Add before closing </body> in project-details.html -->
+<script>
+window.addEventListener('contentLoaderReady', () => {
+  // Get project ID from URL query parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const projectId = parseInt(urlParams.get('id'));
+  
+  if (!projectId) {
+    document.getElementById('projectDetailsContainer').innerHTML = '<p>Project not found</p>';
+    return;
+  }
+  
+  const project = contentLoader.getProjectById(projectId);
+  
+  if (!project) {
+    document.getElementById('projectDetailsContainer').innerHTML = '<p>Project not found</p>';
+    return;
+  }
+  
+  const imagePath = project.image ? `admin/uploads/projects/${project.image}` : 'assets/img/placeholder.jpg';
+  
+  let detailsHTML = `
+    <div class="project-details">
+      <img src="${imagePath}" alt="${project.title}" style="width: 100%; max-width: 600px; margin: 20px 0; border-radius: 8px;">
+      <h1>${project.title}</h1>
+      <p><strong>Category:</strong> ${project.category}</p>
+      <p><strong>Status:</strong> <span style="padding: 5px 10px; background: ${getStatusColor(project.status)}; color: white; border-radius: 3px;">${project.status}</span></p>
+      <h2>Description</h2>
+      <p>${project.description}</p>
+      <h2>Details</h2>
+      <p>${project.details}</p>
+  `;
+  
+  if (project.video) {
+    detailsHTML += `
+      <h2>Project Video</h2>
+      <video width="100%" height="400" controls style="max-width: 600px; border-radius: 8px; margin: 20px 0;">
+        <source src="admin/uploads/projects/${project.video}" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    `;
+  }
+  
+  detailsHTML += `
+    <p><strong>Date:</strong> ${project.date}</p>
+    <a href="projects.html" class="btn-back">← Back to Projects</a>
+  </div>
+  `;
+  
+  document.getElementById('projectDetailsContainer').innerHTML = detailsHTML;
+});
+
+function getStatusColor(status) {
+  const colors = {
+    'pending': '#ffc107',
+    'in-progress': '#17a2b8',
+    'completed': '#28a745'
+  };
+  return colors[status] || '#6c757d';
+}
+</script>
+
+
+<!-- ============================================
+     SERVICE-DETAILS.HTML INTEGRATION
+     ============================================ -->
+
+<!-- STEP 1: Add to <head> section of service-details.html -->
+<link href="assets/css/admin.css" rel="stylesheet">
+<script src="assets/js/content-loader.js"></script>
+
+<!-- STEP 2: Add container for service details -->
+<div id="serviceDetailsContainer">
+  <!-- Dynamic content will be inserted here -->
+</div>
+
+<!-- STEP 3: Add before closing </body> in service-details.html -->
+<script>
+window.addEventListener('contentLoaderReady', () => {
+  // Get service ID from URL query parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const serviceId = parseInt(urlParams.get('id'));
+  
+  if (!serviceId) {
+    document.getElementById('serviceDetailsContainer').innerHTML = '<p>Service not found</p>';
+    return;
+  }
+  
+  const service = contentLoader.getServiceById(serviceId);
+  
+  if (!service) {
+    document.getElementById('serviceDetailsContainer').innerHTML = '<p>Service not found</p>';
+    return;
+  }
+  
+  const imagePath = service.image ? `admin/uploads/services/${service.image}` : 'assets/img/placeholder.jpg';
+  
+  let detailsHTML = `
+    <div class="service-details">
+      <h1>${service.title}</h1>
+      <p class="service-description">${service.description}</p>
+  `;
+  
+  if (service.image) {
+    detailsHTML += `<img src="${imagePath}" alt="${service.title}" style="width: 100%; max-width: 600px; margin: 20px 0; border-radius: 8px;">`;
+  }
+  
+  detailsHTML += `
+    <h2>About This Service</h2>
+    <p>${service.details}</p>
+  `;
+  
+  if (service.video) {
+    detailsHTML += `
+      <h2>Service Video</h2>
+      <video width="100%" height="400" controls style="max-width: 600px; border-radius: 8px; margin: 20px 0;">
+        <source src="admin/uploads/services/${service.video}" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    `;
+  }
+  
+  detailsHTML += `
+    <a href="services.html" class="btn-back">← Back to Services</a>
+  </div>
+  `;
+  
+  document.getElementById('serviceDetailsContainer').innerHTML = detailsHTML;
+});
+</script>
+
+
+<!-- ============================================
+     CSS STYLING FOR CONTENT DISPLAY
+     ============================================ -->
+
+<style>
+/* Projects Grid */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+  margin: 30px 0;
+}
+
+.project-item {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: 0.3s;
+  padding: 0;
+}
+
+.project-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.project-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.project-item h3 {
+  padding: 15px 15px 0;
+  margin: 0;
+  font-size: 20px;
+  color: #2c3e50;
+}
+
+.project-item .category {
+  padding: 0 15px;
+  color: #007bff;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.project-item p {
+  padding: 0 15px 15px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.btn-more {
+  display: inline-block;
+  padding: 10px 15px;
+  margin: 0 15px 15px;
+  background: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+.btn-more:hover {
+  background: #0056b3;
+}
+
+/* Services Grid */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+  margin: 30px 0;
+}
+
+.service-item {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: 0.3s;
+  padding: 20px;
+}
+
+.service-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.service-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.service-item h3 {
+  margin-top: 0;
+  font-size: 20px;
+  color: #2c3e50;
+}
+
+.service-item p {
+  color: #666;
+  line-height: 1.6;
+}
+
+/* Details Pages */
+.project-details,
+.service-details {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.project-details h1,
+.service-details h1 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.project-details h2,
+.service-details h2 {
+  color: #007bff;
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
+.btn-back {
+  display: inline-block;
+  margin-top: 30px;
+  padding: 10px 20px;
+  background: #6c757d;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+.btn-back:hover {
+  background: #5a6268;
+}
+
+@media (max-width: 768px) {
+  .projects-grid,
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .project-details,
+  .service-details {
+    padding: 15px;
+  }
+}
+</style>

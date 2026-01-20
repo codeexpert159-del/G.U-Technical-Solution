@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "title": "Modern Construction Complex",
+    "category": "Commercial",
+    "description": "A large-scale commercial construction project featuring modern architectural design.",
+    "details": "This project involves the construction of a state-of-the-art commercial complex with sustainable building practices.",
+    "image": "default-project.jpg",
+    "video": "sample-project-video.mp4",
+    "status": "completed",
+    "date": "2024-01-15"
+  }
+]

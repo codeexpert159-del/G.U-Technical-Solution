@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Manage Projects - Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  
+  <!-- Favicons (AFTER Bootstrap to ensure priority) -->
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="shortcut icon" href="../assets/img/logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/img/logo.png">
+  <style>
+    :root {
+      --admin-primary: #4A2E2B;
+      --admin-accent: #F7931D;
+      --admin-light: #eff1f3;
+      --admin-white: #ffffff;
+      --admin-text: #4A2E2B;
+      --admin-border: #e9ecef;
+      --admin-success: #059652;
+      --admin-danger: #df1529;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--admin-light);
+      color: var(--admin-text);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Ubuntu', sans-serif;
+      color: var(--admin-primary);
+    }
+
+    .sidebar {
+      background: var(--admin-primary);
+      color: white;
+      min-height: 100vh;
+      padding: 20px 0;
+      position: fixed;
+      width: 250px;
+      left: 0;
+      top: 0;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    }
+
+    .sidebar .logo {
+      padding: 20px;
+      font-size: 20px;
+      font-weight: 700;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      margin-bottom: 20px;
+      font-family: 'Ubuntu', sans-serif;
+      color: var(--admin-accent);
+    }
+
+    .sidebar .nav-link {
+      color: rgba(255,255,255,0.75);
+      padding: 12px 20px;
+      display: block;
+      transition: 0.3s;
+      text-decoration: none;
+      border-left: 3px solid transparent;
+    }
+
+    .sidebar .nav-link:hover,
+    .sidebar .nav-link.active {
+      color: var(--admin-accent);
+      background: rgba(247,147,29,0.1);
+      border-left-color: var(--admin-accent);
+      padding-left: 17px;
+    }
+
+    .main-content {
+      margin-left: 250px;
+      padding: 30px;
+    }
+
+    .header {
+      background: var(--admin-white);
+      padding: 25px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 3px solid var(--admin-accent);
+    }
+
+    .header h1 {
+      margin: 0;
+      color: var(--admin-primary);
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .btn-add {
+      background: var(--admin-primary);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 5px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .btn-add:hover {
+      background: var(--admin-accent);
+      box-shadow: 0 2px 8px rgba(247,147,29,0.3);
+    }
+
+    .table-container {
+      background: var(--admin-white);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: var(--admin-light);
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--admin-primary);
+      border-bottom: 2px solid var(--admin-border);
+    }
+
+    td {
+      padding: 15px;
+      border-bottom: 1px solid var(--admin-border);
+    }
+
+    tr:hover {
+      background: var(--admin-light);
+    }
+
+    .btn-edit, .btn-delete {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      margin-right: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .btn-edit {
+      background: var(--admin-primary);
+      color: white;
+    }
+
+    .btn-edit:hover {
+      background: var(--admin-accent);
+    }
+
+    .btn-delete {
+      background: var(--admin-danger);
+      color: white;
+    }
+
+    .btn-delete:hover {
+      background: #c00a1a;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.4);
+    }
+
+    .modal-content {
+      background-color: var(--admin-white);
+      margin: 5% auto;
+      padding: 30px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: var(--admin-primary);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: var(--admin-primary);
+    }
+
+    input[type="text"],
+    input[type="file"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--admin-border);
+      border-radius: 5px;
+      font-family: 'Lato', sans-serif;
+      color: var(--admin-text);
+    }
+
+    input[type="text"]:focus,
+    input[type="file"]:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--admin-accent);
+      box-shadow: 0 0 0 3px rgba(247,147,29,0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .btn-submit {
+      background: var(--admin-primary);
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+      width: 100%;
+    }
+
+    .btn-submit:hover {
+      background: var(--admin-accent);
+      box-shadow: 0 2px 8px rgba(247,147,29,0.3);
+    }
+
+    .alert {
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      font-weight: 600;
+    }
+
+    .alert-success {
+      background: #d4edda;
+      color: var(--admin-success);
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+      background: #f8d7da;
+      color: var(--admin-danger);
+      border: 1px solid #f5c6cb;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 15px;
+      }
+
+      .header {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      table {
+        font-size: 12px;
+      }
+
+      th, td {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo">G.U Admin</div>
+    <nav>
+      <a href="index.html" class="nav-link">
+        <i class="bi bi-speedometer2"></i> Dashboard
+      </a>
+      <a href="projects.html" class="nav-link active">
+        <i class="bi bi-building"></i> Projects
+      </a>
+      <a href="services.html" class="nav-link">
+        <i class="bi bi-gear"></i> Services
+      </a>
+      <a href="logout.php" class="nav-link" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+        <i class="bi bi-box-arrow-right"></i> Logout
+      </a>
+    </nav>
+  </div>
+
+  <div class="main-content">
+    <div class="header">
+      <h1>Manage Projects</h1>
+      <button class="btn-add" onclick="openAddModal()">+ Add New Project</button>
+    </div>
+
+    <div id="alertBox"></div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="projectsTable">
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 30px;">Loading...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div id="projectModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2 id="modalTitle">Add New Project</h2>
+      <form id="projectForm">
+        <input type="hidden" id="projectId">
+        
+        <div class="form-group">
+          <label>Title *</label>
+          <input type="text" id="title" required>
+        </div>
+
+        <div class="form-group">
+          <label>Category *</label>
+          <input type="text" id="category" placeholder="e.g., Commercial, Residential" required>
+        </div>
+
+        <div class="form-group">
+          <label>Description *</label>
+          <textarea id="description" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Details *</label>
+          <textarea id="details" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Project Image</label>
+          <input type="file" id="image" accept="image/*">
+          <small>Current: <span id="currentImage">None</span></small>
+        </div>
+
+        <div class="form-group">
+          <label>Project Video (MP4, WebM)</label>
+          <input type="file" id="video" accept="video/*">
+          <small>Current: <span id="currentVideo">None</span></small>
+        </div>
+
+        <div class="form-group">
+          <label>Status *</label>
+          <select id="status" required>
+            <option value="pending">Pending</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-submit">Save Project</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let projects = [];
+
+    function loadProjects() {
+      fetch('api/get-projects.php')
+        .then(response => response.json())
+        .then(data => {
+          projects = data;
+          displayProjects();
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showAlert('Error loading projects', 'error');
+        });
+    }
+
+    function displayProjects() {
+      const tableBody = document.getElementById('projectsTable');
+      if (projects.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 30px;">No projects found</td></tr>';
+        return;
+      }
+
+      tableBody.innerHTML = projects.map(project => `
+        <tr>
+          <td>${project.id}</td>
+          <td>${project.title}</td>
+          <td>${project.category}</td>
+          <td><span style="padding: 5px 10px; background: ${getStatusColor(project.status)}; color: white; border-radius: 3px;">${project.status}</span></td>
+          <td>
+            <button class="btn-edit" onclick="editProject(${project.id})">Edit</button>
+            <button class="btn-delete" onclick="deleteProject(${project.id})">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function getStatusColor(status) {
+      const colors = {
+        'pending': '#ffc107',
+        'in-progress': '#17a2b8',
+        'completed': '#28a745'
+      };
+      return colors[status] || '#6c757d';
+    }
+
+    function openAddModal() {
+      document.getElementById('modalTitle').textContent = 'Add New Project';
+      document.getElementById('projectForm').reset();
+      document.getElementById('projectId').value = '';
+      document.getElementById('currentImage').textContent = 'None';
+      document.getElementById('currentVideo').textContent = 'None';
+      document.getElementById('projectModal').style.display = 'block';
+    }
+
+    function editProject(id) {
+      const project = projects.find(p => p.id == id);
+      if (!project) return;
+
+      document.getElementById('modalTitle').textContent = 'Edit Project';
+      document.getElementById('projectId').value = project.id;
+      document.getElementById('title').value = project.title;
+      document.getElementById('category').value = project.category;
+      document.getElementById('description').value = project.description;
+      document.getElementById('details').value = project.details;
+      document.getElementById('status').value = project.status;
+      document.getElementById('currentImage').textContent = project.image || 'None';
+      document.getElementById('currentVideo').textContent = project.video || 'None';
+
+      document.getElementById('projectModal').style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('projectModal').style.display = 'none';
+    }
+
+    function deleteProject(id) {
+      if (!confirm('Are you sure you want to delete this project?')) return;
+
+      fetch('api/delete-project.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showAlert('Project deleted successfully', 'success');
+          loadProjects();
+        } else {
+          showAlert('Error: ' + data.message, 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showAlert('Error deleting project', 'error');
+      });
+    }
+
+    document.getElementById('projectForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const id = document.getElementById('projectId').value;
+      const title = document.getElementById('title').value;
+      const category = document.getElementById('category').value;
+      const description = document.getElementById('description').value;
+      const details = document.getElementById('details').value;
+      const status = document.getElementById('status').value;
+      let image = document.getElementById('currentImage').textContent;
+      let video = document.getElementById('currentVideo').textContent;
+
+      // Handle file uploads
+      const imageFile = document.getElementById('image').files[0];
+      const videoFile = document.getElementById('video').files[0];
+
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append('file', imageFile);
+        const uploadResponse = await fetch('api/upload-project-media.php', {
+          method: 'POST',
+          body: formData
+        });
+        const uploadData = await uploadResponse.json();
+        if (uploadData.success) {
+          image = uploadData.filename;
+        }
+      }
+
+      if (videoFile) {
+        const formData = new FormData();
+        formData.append('file', videoFile);
+        const uploadResponse = await fetch('api/upload-project-media.php', {
+          method: 'POST',
+          body: formData
+        });
+        const uploadData = await uploadResponse.json();
+        if (uploadData.success) {
+          video = uploadData.filename;
+        }
+      }
+
+      const endpoint = id ? 'api/update-project.php' : 'api/add-project.php';
+      const data = {
+        title, category, description, details, status, image, video
+      };
+      if (id) data.id = parseInt(id);
+
+      fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showAlert('Project saved successfully', 'success');
+          closeModal();
+          loadProjects();
+        } else {
+          showAlert('Error: ' + data.message, 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showAlert('Error saving project', 'error');
+      });
+    });
+
+    function showAlert(message, type) {
+      const alertBox = document.getElementById('alertBox');
+      alertBox.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+      setTimeout(() => {
+        alertBox.innerHTML = '';
+      }, 5000);
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('projectModal');
+      if (event.target == modal) {
+        closeModal();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadProjects);
+  </script>
+</body>
+</html>

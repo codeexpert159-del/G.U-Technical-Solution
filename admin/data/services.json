@@ -1,0 +1,11 @@
+[
+  {
+    "id": 1,
+    "title": "Project Management",
+    "description": "Professional project management services for construction projects.",
+    "details": "We provide comprehensive project management services including planning, coordination, and execution.",
+    "icon": "bi-diagram-3",
+    "image": "default-service.jpg",
+    "video": "sample-service-video.mp4"
+  }
+]
