@@ -53,9 +53,13 @@ git init
 git add .
 git commit -m "Initial commit - G.U Solutions website"
 git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/gu-solutions.git
+git remote add origin https://github.com/codeexpert159-del/gu-solutions.git
 git push -u origin main
 ```
+codeexpert159-del
+git remote set-url origin https://github.com/codeexpert159-del/G.U-Technical-Solution.git
+@github.com/codeexpert159-del/gu-solutions.git
+
 
 **Step 3: Deploy to Vercel**
 1. Go to vercel.com
